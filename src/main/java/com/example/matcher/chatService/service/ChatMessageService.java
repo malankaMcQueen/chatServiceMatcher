@@ -39,9 +39,17 @@ public class ChatMessageService {
         message.setContent(newMessageDTO.getContent());
         message.setSenderId(newMessageDTO.getSenderId());
         message.setTimestamp(LocalDateTime.now());
-        message.setStatus(MessageStatus.RECEIVED);
+        message.setStatus(MessageStatus.DELIVERY);
         chatRoomService.addNewMessage(message, newMessageDTO.getChatRoomId()); // Сохранит Message через каскад
     }
+
+    public void markMessageAsRead(Long messageId) {     // TODO Сделать запрос в БД на update вместо вытягивания, изменения и сохранения
+        Message message = chatMessageRepository.findById(messageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Message not found"));
+        message.setStatus(MessageStatus.READ);
+        chatMessageRepository.save(message);
+    }
+
 
     @Transactional
     public void sendNewMessage(NewMessageDTO newMessageDTO) {
@@ -76,3 +84,6 @@ public class ChatMessageService {
         return message;
     }
 }
+
+
+

@@ -2,10 +2,12 @@ package com.example.matcher.chatService.controllers;
 
 import com.example.matcher.chatService.aspect.AspectAnnotation;
 import com.example.matcher.chatService.configuration.WebSocketConfiguration;
+import com.example.matcher.chatService.dto.AcknowledgementDto;
 import com.example.matcher.chatService.dto.ChatRoomDTO;
 import com.example.matcher.chatService.dto.NewMessageDTO;
 import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
+import com.example.matcher.chatService.model.MessageStatus;
 import com.example.matcher.chatService.service.ChatMessageService;
 import com.example.matcher.chatService.service.ChatRoomService;
 import lombok.AllArgsConstructor;
@@ -59,6 +61,13 @@ public class ChatController {
     @MessageMapping("/chat")
     public void processMessage(@Payload NewMessageDTO newMessageDTO) {
         chatMessageService.sendNewMessage(newMessageDTO);
+    }
+
+    @MessageMapping("/message/read")
+    public void messageAcknowledged(AcknowledgementDto ackDto) {
+        if (ackDto.getStatus() == MessageStatus.READ) {
+            chatMessageService.markMessageAsRead(ackDto.getMessageId());
+        }
     }
 
 
