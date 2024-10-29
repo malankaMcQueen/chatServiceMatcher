@@ -1,10 +1,11 @@
 package com.example.matcher.chatService.controllers;
 
-import com.example.matcher.chatService.aspect.AspectAnnotation;
 import com.example.matcher.chatService.configuration.WebSocketConfiguration;
 import com.example.matcher.chatService.dto.AcknowledgementDto;
 import com.example.matcher.chatService.dto.ChatRoomDTO;
-import com.example.matcher.chatService.dto.NewMessageDTO;
+import com.example.matcher.chatService.dto.message.DeleteMessageDTO;
+import com.example.matcher.chatService.dto.message.EditMessageDTO;
+import com.example.matcher.chatService.dto.message.NewMessageDTO;
 import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
 import com.example.matcher.chatService.model.MessageStatus;
@@ -17,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,7 +49,7 @@ public class ChatController {
     }
 
     @DeleteMapping("/message/deleteMessage")
-    public ResponseEntity<String> deleteMessage(@RequestBody Message message) {
+    public ResponseEntity<String> deleteMessage(@RequestBody DeleteMessageDTO message) {
         return new ResponseEntity<>(chatMessageService.deleteMessage(message), HttpStatus.OK);
     }
 
@@ -58,17 +58,12 @@ public class ChatController {
         return new ResponseEntity<>(chatRoomService.getListLastChatRooms(userId), HttpStatus.OK);
     }
 
-    @MessageMapping("/chat")
-    public void processMessage(@Payload NewMessageDTO newMessageDTO) {
-        chatMessageService.sendNewMessage(newMessageDTO);
-    }
+//    @MessageMapping("/chat")
+//    public void processMessage(@Payload NewMessageDTO newMessageDTO) {
+//        chatMessageService.sendNewMessage(newMessageDTO);
+//    }
 
-    @MessageMapping("/message/read")
-    public void messageAcknowledged(AcknowledgementDto ackDto) {
-        if (ackDto.getStatus() == MessageStatus.READ) {
-            chatMessageService.markMessageAsRead(ackDto.getMessageId());
-        }
-    }
+
 
 
     @GetMapping("/chat/getHistory")
@@ -83,8 +78,8 @@ public class ChatController {
     }
 
     @PutMapping("/message/edit")
-    public ResponseEntity<Message> editMessage(@RequestBody Message message) {
-        return new ResponseEntity<>(chatMessageService.editMessage(message), HttpStatus.OK);
+    public ResponseEntity<Message> editMessage(@RequestBody EditMessageDTO editMessageDTO) {
+        return new ResponseEntity<>(chatMessageService.editMessage(editMessageDTO), HttpStatus.OK);
     }
 
 

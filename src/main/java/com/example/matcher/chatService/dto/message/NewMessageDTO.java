@@ -1,4 +1,4 @@
-package com.example.matcher.chatService.dto;
+package com.example.matcher.chatService.dto.message;
 
 import com.example.matcher.chatService.model.MessageStatus;
 import lombok.Data;

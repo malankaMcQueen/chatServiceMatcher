@@ -1,8 +1,9 @@
 package com.example.matcher.chatService.service;
 
-import com.example.matcher.chatService.aspect.AspectAnnotation;
 import com.example.matcher.chatService.configuration.WebSocketConfiguration;
-import com.example.matcher.chatService.dto.NewMessageDTO;
+import com.example.matcher.chatService.dto.message.DeleteMessageDTO;
+import com.example.matcher.chatService.dto.message.EditMessageDTO;
+import com.example.matcher.chatService.dto.message.NewMessageDTO;
 import com.example.matcher.chatService.exception.BadRequestException;
 import com.example.matcher.chatService.exception.ResourceNotFoundException;
 import com.example.matcher.chatService.model.ChatRoom;
@@ -10,7 +11,6 @@ import com.example.matcher.chatService.model.Message;
 import com.example.matcher.chatService.model.MessageStatus;
 import com.example.matcher.chatService.repository.ChatMessageRepository;
 import com.example.matcher.chatService.repository.ChatRoomRepository;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,13 +32,14 @@ public class ChatMessageService {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketConfiguration.class);
 
 
-    public void saveNewMessage(NewMessageDTO newMessageDTO) {
+    public Message saveNewMessage(NewMessageDTO newMessageDTO) {
         Message message = new Message();
         message.setContent(newMessageDTO.getContent());
         message.setSenderId(newMessageDTO.getSenderId());
         message.setTimestamp(LocalDateTime.now());
         message.setStatus(MessageStatus.DELIVERY);
         chatRoomService.addNewMessage(message, newMessageDTO.getChatRoomId()); // Сохранит Message через каскад
+        return message;
     }
 
     public void markMessageAsRead(Long messageId) {     // TODO Сделать запрос в БД на update вместо вытягивания, изменения и сохранения
@@ -63,22 +62,25 @@ public class ChatMessageService {
         } else {
             throw new BadRequestException("Some Error");
         }
-        saveNewMessage(newMessageDTO);
+        Message message = saveNewMessage(newMessageDTO);
+        String topic = "/topic/user/" + message.getSenderId() + "/message/confirmations";
+        messagingTemplate.convertAndSend(topic, message);
         messagingTemplate.convertAndSendToUser(
-                targetUserId.toString(), "/queue/messages", newMessageDTO);
+                targetUserId.toString(), "/queue/messages", message);
+
     }
 
 
-    public String deleteMessage(Message message) {
-        chatMessageRepository.deleteById(message.getId());
+    public String deleteMessage(DeleteMessageDTO message) {
+        chatMessageRepository.deleteById(message.getMessageId());
         return "Success";
     }
 
-    public Message editMessage(Message newMessage) {
-        Message message = chatMessageRepository.findById(newMessage.getId()).orElseThrow(()
-                -> new ResourceNotFoundException("message with id: " + newMessage.getId() + "doesnt exist"));
-        if (!message.getContent().equals(newMessage.getContent())) {
-            message.setContent(newMessage.getContent());
+    public Message editMessage(EditMessageDTO newMessage) {
+        Message message = chatMessageRepository.findById(newMessage.getMessageId()).orElseThrow(()
+                -> new ResourceNotFoundException("message with id: " + newMessage.getMessageId() + "doesnt exist"));
+        if (!message.getContent().equals(newMessage.getNewContent())) {
+            message.setContent(newMessage.getNewContent());
             chatMessageRepository.save(message);
         }
         return message;
