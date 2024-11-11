@@ -1,15 +1,19 @@
 package com.example.matcher.chatService.service;
 
+import com.example.matcher.chatService.configuration.WebSocketConfiguration;
 import com.example.matcher.chatService.dto.ChatRoomDTO;
 import com.example.matcher.chatService.exception.ResourceNotFoundException;
 import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
 import com.example.matcher.chatService.repository.ChatRoomRepository;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,15 +23,19 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class ChatRoomService {
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketConfiguration.class);
+
 
     private ChatRoomRepository chatRoomRepository;
-    public void addNewMessage(Message message, Long chatId) {
+    public Message addNewMessage(Message message, Long chatId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatId).orElseThrow(()
                 -> new ResourceNotFoundException("Chat Id: " + chatId + " not found"));
         message.setChatRoom(chatRoom);
         chatRoom.getMessageList().add(message);
         chatRoom.setTimeLastUpdate(LocalDateTime.now());
-        chatRoomRepository.save(chatRoom);
+        chatRoom = chatRoomRepository.save(chatRoom);
+        message = chatRoom.getMessageList().get(chatRoom.getMessageList().size() - 1);
+        return message;
     }
 
 
@@ -73,6 +81,7 @@ public class ChatRoomService {
                     );
                 })
                 .collect(Collectors.toList());
+        logger.info("Chat room success: " + chatRoomDTOList.size());
         return chatRoomDTOList;
     }
 

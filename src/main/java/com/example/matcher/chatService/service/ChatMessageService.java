@@ -1,9 +1,11 @@
 package com.example.matcher.chatService.service;
 
+import com.example.matcher.chatService.aspect.AspectAnnotation;
 import com.example.matcher.chatService.configuration.WebSocketConfiguration;
 import com.example.matcher.chatService.dto.message.DeleteMessageDTO;
 import com.example.matcher.chatService.dto.message.EditMessageDTO;
 import com.example.matcher.chatService.dto.message.NewMessageDTO;
+import com.example.matcher.chatService.dto.message.ReadMessageDTO;
 import com.example.matcher.chatService.exception.BadRequestException;
 import com.example.matcher.chatService.exception.ResourceNotFoundException;
 import com.example.matcher.chatService.model.ChatRoom;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Service
@@ -32,21 +35,25 @@ public class ChatMessageService {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketConfiguration.class);
 
 
+    @AspectAnnotation
     public Message saveNewMessage(NewMessageDTO newMessageDTO) {
         Message message = new Message();
         message.setContent(newMessageDTO.getContent());
         message.setSenderId(newMessageDTO.getSenderId());
+//        message.setTimestamp(LocalDateTime.now());
         message.setTimestamp(LocalDateTime.now());
         message.setStatus(MessageStatus.DELIVERY);
-        chatRoomService.addNewMessage(message, newMessageDTO.getChatRoomId()); // Сохранит Message через каскад
+        message = chatRoomService.addNewMessage(message, newMessageDTO.getChatRoomId()); // Сохранит Message через каскад
         return message;
     }
 
-    public void markMessageAsRead(Long messageId) {     // TODO Сделать запрос в БД на update вместо вытягивания, изменения и сохранения
-        Message message = chatMessageRepository.findById(messageId)
+    public void markMessageAsRead(ReadMessageDTO readMessage) {     // TODO Сделать запрос в БД на update вместо вытягивания, изменения и сохранения
+        Message message = chatMessageRepository.findById(readMessage.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Message not found"));
         message.setStatus(MessageStatus.READ);
         chatMessageRepository.save(message);
+        String topic = "/topic/user/" + message.getSenderId() + "/message/read";
+        messagingTemplate.convertAndSend(topic, message);
     }
 
 

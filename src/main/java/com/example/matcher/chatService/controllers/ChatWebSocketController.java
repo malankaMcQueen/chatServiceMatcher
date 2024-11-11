@@ -4,6 +4,7 @@ import com.example.matcher.chatService.dto.AcknowledgementDto;
 import com.example.matcher.chatService.dto.message.NewMessageDTO;
 import com.example.matcher.chatService.dto.message.DeleteMessageDTO;
 import com.example.matcher.chatService.dto.message.EditMessageDTO;
+import com.example.matcher.chatService.dto.message.ReadMessageDTO;
 import com.example.matcher.chatService.model.Message;
 import com.example.matcher.chatService.model.MessageStatus;
 import com.example.matcher.chatService.service.ChatMessageService;
@@ -24,11 +25,10 @@ public class ChatWebSocketController {
         chatMessageService.sendNewMessage(newMessageDTO);
     }
 
-//    @MessageMapping("/chat/message/confirm")
-//    public void confirmMessage(Message message) {
-//        String topic = "/topic/user/" + message.getSenderId() + "/message/confirmations";
-//        messagingTemplate.convertAndSend(topic, message);
-//    }
+    @MessageMapping("/chat/message/read")
+    public void confirmMessage(ReadMessageDTO message) {
+        chatMessageService.markMessageAsRead(message);
+    }
 
 
     @MessageMapping("/chat/message/delete")
@@ -41,11 +41,5 @@ public class ChatWebSocketController {
         chatMessageService.editMessage(editMessageDTO);
     }
 
-    @MessageMapping("/message/read")
-    public void messageAcknowledged(AcknowledgementDto ackDto) {
-        if (ackDto.getStatus() == MessageStatus.READ) {
-            chatMessageService.markMessageAsRead(ackDto.getMessageId());
-        }
-    }
 }
 

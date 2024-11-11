@@ -2,6 +2,7 @@ package com.example.matcher.chatService.configuration;
 
 import com.example.matcher.chatService.aspect.AspectAnnotation;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -50,12 +51,30 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
         DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
         resolver.setDefaultMimeType(MimeTypeUtils.APPLICATION_JSON);
+
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-        converter.setObjectMapper(new ObjectMapper());
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Регистрируем модуль для работы с Java 8 временем
+        objectMapper.registerModule(new JavaTimeModule());
+
+        converter.setObjectMapper(objectMapper);
         converter.setContentTypeResolver(resolver);
+
         messageConverters.add(converter);
         return false;
     }
+
+//    @Override
+//    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
+//        DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
+//        resolver.setDefaultMimeType(MimeTypeUtils.APPLICATION_JSON);
+//        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+//        converter.setObjectMapper(new ObjectMapper());
+//        converter.setContentTypeResolver(resolver);
+//        messageConverters.add(converter);
+//        return false;
+//    }
 
     @Override
     @AspectAnnotation
