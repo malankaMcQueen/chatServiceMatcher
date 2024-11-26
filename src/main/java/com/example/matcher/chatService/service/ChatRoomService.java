@@ -1,7 +1,8 @@
 package com.example.matcher.chatService.service;
 
 import com.example.matcher.chatService.configuration.WebSocketConfiguration;
-import com.example.matcher.chatService.dto.ChatRoomDTO;
+import com.example.matcher.chatService.dto.ChatRoomWithLastMessageDTO;
+import com.example.matcher.chatService.exception.ResourceAlreadyExistsException;
 import com.example.matcher.chatService.exception.ResourceNotFoundException;
 import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
@@ -9,11 +10,9 @@ import com.example.matcher.chatService.repository.ChatRoomRepository;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +42,7 @@ public class ChatRoomService {
     public ChatRoom createNewChat(UUID firstUserId, UUID secondUserId) {
         Optional<ChatRoom> existingChatRoom = chatRoomRepository.findChatRoomBetweenUsers(firstUserId, secondUserId);
         if (existingChatRoom.isPresent()) {
-            throw new IllegalStateException("Chat already exists.");
+            throw new ResourceAlreadyExistsException("Chat already exists.");
         }
         //  Проверить взаимные лайки можно ли создавать чат
         ChatRoom chatRoom = new ChatRoom();
@@ -65,13 +64,13 @@ public class ChatRoomService {
         return chatRoomRepository.findChatHistoryByChatId(chatId);
     }
 
-    public List<ChatRoomDTO> getListLastChatRooms(UUID userId) {
+    public List<ChatRoomWithLastMessageDTO> getListLastChatRooms(UUID userId) {
         List<Object[]> results = chatRoomRepository.findListLastChatRoomsWithLastMessage(userId);
-        List<ChatRoomDTO> chatRoomDTOList = results.stream()
+        List<ChatRoomWithLastMessageDTO> chatRoomWithLastMessageDTOList = results.stream()
                 .map(result -> {
                     ChatRoom chatRoom = (ChatRoom) result[0];
                     Message lastMessage = (Message) result[1];
-                    return new ChatRoomDTO(
+                    return new ChatRoomWithLastMessageDTO(
                             chatRoom.getId(),
                             chatRoom.getFirstUserId(),
                             chatRoom.getSecondUserId(),
@@ -81,8 +80,8 @@ public class ChatRoomService {
                     );
                 })
                 .collect(Collectors.toList());
-        logger.info("Chat room success: " + chatRoomDTOList.size());
-        return chatRoomDTOList;
+        logger.info("Chat room success: " + chatRoomWithLastMessageDTOList.size());
+        return chatRoomWithLastMessageDTOList;
     }
 
     public List<ChatRoom> getAllChatRooms() {

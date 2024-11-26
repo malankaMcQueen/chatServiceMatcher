@@ -39,6 +39,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ErrorMessage> resourceAlreadyExistException(final ResourceAlreadyExistsException ex,
+                                                                    final WebRequest request) {
+        ErrorMessage message = new ErrorMessage(
+                HttpStatus.CONFLICT.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+    }
     @ExceptionHandler(TokenExpiredException.class)
     public ResponseEntity<ErrorMessage> tokenExpiredException(final TokenExpiredException ex,
                                                                     final WebRequest request) {

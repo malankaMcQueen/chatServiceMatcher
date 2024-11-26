@@ -18,7 +18,6 @@ import org.springframework.stereotype.Controller;
 @AllArgsConstructor
 public class ChatWebSocketController {
     private ChatMessageService chatMessageService;
-    private SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/chat/message/send")
     public void sendMessage(@Payload NewMessageDTO newMessageDTO) {

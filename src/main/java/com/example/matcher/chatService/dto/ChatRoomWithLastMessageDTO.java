@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-public class ChatRoomDTO {
+public class ChatRoomWithLastMessageDTO {
     private Long id;
     private UUID firstUserId;
     private UUID secondUserId;
