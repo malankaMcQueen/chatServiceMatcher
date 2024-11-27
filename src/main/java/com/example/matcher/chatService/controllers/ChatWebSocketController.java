@@ -19,23 +19,23 @@ import org.springframework.stereotype.Controller;
 public class ChatWebSocketController {
     private ChatMessageService chatMessageService;
 
-    @MessageMapping("/chat/message/send")
+    @MessageMapping("/ChatService/chat/message/send")
     public void sendMessage(@Payload NewMessageDTO newMessageDTO) {
         chatMessageService.sendNewMessage(newMessageDTO);
     }
 
-    @MessageMapping("/chat/message/read")
+    @MessageMapping("/ChatService/chat/message/read")
     public void confirmMessage(ReadMessageDTO message) {
         chatMessageService.markMessageAsRead(message);
     }
 
 
-    @MessageMapping("/chat/message/delete")
+    @MessageMapping("/ChatService/chat/message/delete")
     public void deleteMessage(@Payload DeleteMessageDTO deleteMessageDTO) {
         chatMessageService.deleteMessage(deleteMessageDTO);
     }
 
-    @MessageMapping("/chat/message/edit")
+    @MessageMapping("/ChatService/chat/message/edit")
     public void editMessage(@Payload EditMessageDTO editMessageDTO) {
         chatMessageService.editMessage(editMessageDTO);
     }

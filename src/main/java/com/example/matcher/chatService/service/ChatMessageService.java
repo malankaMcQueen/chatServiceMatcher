@@ -52,7 +52,7 @@ public class ChatMessageService {
                 .orElseThrow(() -> new ResourceNotFoundException("Message not found"));
         message.setStatus(MessageStatus.READ);
         chatMessageRepository.save(message);
-        String topic = "ChatService//topic/user/" + message.getSenderId() + "/message/read";
+        String topic = "/ChatService/topic/user/" + message.getSenderId() + "/message/read";
         messagingTemplate.convertAndSend(topic, message);
     }
 
