@@ -2,6 +2,7 @@ package com.example.matcher.chatService.service;
 
 import com.example.matcher.chatService.configuration.WebSocketConfiguration;
 import com.example.matcher.chatService.dto.ChatRoomWithLastMessageDTO;
+import com.example.matcher.chatService.exception.InvalidCredentialsException;
 import com.example.matcher.chatService.exception.ResourceAlreadyExistsException;
 import com.example.matcher.chatService.exception.ResourceNotFoundException;
 import com.example.matcher.chatService.model.ChatRoom;
@@ -88,13 +89,27 @@ public class ChatRoomService {
         return chatRoomRepository.findAll();
     }
 
-    public String deleteMessage(Message message, Long chatRoomId) {
+    public UUID getIdAnotherUser(Long chatRoomId, UUID firstUserId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(()
-                -> new ResourceNotFoundException("Chat with id: " + chatRoomId + "doesnt exist"));
-        message.setChatRoom(chatRoom);
-        chatRoom.getMessageList().remove(message);
-        chatRoomRepository.save(chatRoom); // Сообщение будет удалено из БД
-        return "Success";
+                -> new ResourceNotFoundException("Chat doesnt exist"));
+        UUID targetUserId;
+        if (chatRoom.getFirstUserId().equals(firstUserId)) {
+            targetUserId = chatRoom.getSecondUserId();
+        } else if (chatRoom.getSecondUserId().equals(firstUserId)) {
+            targetUserId = chatRoom.getFirstUserId();
+        } else {
+            throw new InvalidCredentialsException("Illegal access");
+        }
+        return targetUserId;
     }
+
+//    public String deleteMessage(Message message, Long chatRoomId) {
+//        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(()
+//                -> new ResourceNotFoundException("Chat with id: " + chatRoomId + "doesnt exist"));
+//        message.setChatRoom(chatRoom);
+//        chatRoom.getMessageList().remove(message);
+//        chatRoomRepository.save(chatRoom); // Сообщение будет удалено из БД
+//        return "Success";
+//    }
 }
 

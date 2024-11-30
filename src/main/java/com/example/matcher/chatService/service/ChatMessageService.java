@@ -7,6 +7,7 @@ import com.example.matcher.chatService.dto.message.EditMessageDTO;
 import com.example.matcher.chatService.dto.message.NewMessageDTO;
 import com.example.matcher.chatService.dto.message.ReadMessageDTO;
 import com.example.matcher.chatService.exception.BadRequestException;
+import com.example.matcher.chatService.exception.InvalidCredentialsException;
 import com.example.matcher.chatService.exception.ResourceNotFoundException;
 import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
@@ -35,12 +36,10 @@ public class ChatMessageService {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketConfiguration.class);
 
 
-    @AspectAnnotation
     public Message saveNewMessage(NewMessageDTO newMessageDTO) {
         Message message = new Message();
         message.setContent(newMessageDTO.getContent());
         message.setSenderId(newMessageDTO.getSenderId());
-//        message.setTimestamp(LocalDateTime.now());
         message.setTimestamp(LocalDateTime.now());
         message.setStatus(MessageStatus.DELIVERY);
         message = chatRoomService.addNewMessage(message, newMessageDTO.getChatRoomId()); // Сохранит Message через каскад
@@ -59,6 +58,9 @@ public class ChatMessageService {
 
     @Transactional
     public void sendNewMessage(NewMessageDTO newMessageDTO) {
+        if (newMessageDTO.getContent().isEmpty()) {
+            return;
+        }
         ChatRoom chatRoom = chatRoomRepository.findById(newMessageDTO.getChatRoomId()).orElseThrow(()
                 -> new ResourceNotFoundException("Chat with id: " + newMessageDTO.getChatRoomId() + "not exist"));
         UUID targetUserId;
@@ -78,17 +80,35 @@ public class ChatMessageService {
     }
 
 
-    public String deleteMessage(DeleteMessageDTO message) {
-        chatMessageRepository.deleteById(message.getMessageId());
+    public String deleteMessage(DeleteMessageDTO messageDTO) {
+        UUID targetUserId = chatRoomService.getIdAnotherUser(messageDTO.getChatRoomId(), messageDTO.getSenderId());
+        chatMessageRepository.deleteById(messageDTO.getMessageId());
+        String topic = "/ChatService/topic/user/" + targetUserId.toString() + "/message/delete";
+        messagingTemplate.convertAndSend(topic, messageDTO);
         return "Success";
     }
 
     public Message editMessage(EditMessageDTO newMessage) {
         Message message = chatMessageRepository.findById(newMessage.getMessageId()).orElseThrow(()
                 -> new ResourceNotFoundException("message with id: " + newMessage.getMessageId() + "doesnt exist"));
-        if (!message.getContent().equals(newMessage.getNewContent())) {
-            message.setContent(newMessage.getNewContent());
-            chatMessageRepository.save(message);
+        if (newMessage.getNewContent().isEmpty()) {
+            DeleteMessageDTO deleteMessageDTO = new DeleteMessageDTO();
+            deleteMessageDTO.setMessageId(newMessage.getMessageId());
+            deleteMessageDTO.setChatRoomId(newMessage.getChatRoomId());
+            deleteMessageDTO.setSenderId(newMessage.getSenderId());
+            this.deleteMessage(deleteMessageDTO);
+            message.setContent("");
+        }
+        else {
+            UUID targetUserId = chatRoomService.getIdAnotherUser(newMessage.getChatRoomId(), newMessage.getSenderId());
+            if (message.getSenderId().equals(newMessage.getSenderId())) {
+                if (!message.getContent().equals(newMessage.getNewContent())) {
+                    message.setContent(newMessage.getNewContent());
+                    chatMessageRepository.save(message);
+                    String topic = "/ChatService/topic/user/" + targetUserId.toString() + "/message/edit";
+                    messagingTemplate.convertAndSend(topic, newMessage);
+                }
+            }
         }
         return message;
     }

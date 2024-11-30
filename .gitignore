@@ -39,3 +39,7 @@ build/
 .vscode/
 
 .env
+.envForDocker
+docker-compose.yml
+chatService.tar
+Dockerfile

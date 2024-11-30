@@ -1,5 +1,6 @@
 package com.example.matcher.chatService.controllers;
 
+import com.example.matcher.chatService.aspect.AspectAnnotation;
 import com.example.matcher.chatService.dto.AcknowledgementDto;
 import com.example.matcher.chatService.dto.message.NewMessageDTO;
 import com.example.matcher.chatService.dto.message.DeleteMessageDTO;
@@ -18,24 +19,26 @@ import org.springframework.stereotype.Controller;
 @AllArgsConstructor
 public class ChatWebSocketController {
     private ChatMessageService chatMessageService;
-
-    @MessageMapping("/ChatService/chat/message/send")
+    @AspectAnnotation
+    @MessageMapping("/chat/message/send")
     public void sendMessage(@Payload NewMessageDTO newMessageDTO) {
         chatMessageService.sendNewMessage(newMessageDTO);
     }
 
-    @MessageMapping("/ChatService/chat/message/read")
+    @AspectAnnotation
+    @MessageMapping("/chat/message/read")
     public void confirmMessage(ReadMessageDTO message) {
         chatMessageService.markMessageAsRead(message);
     }
 
-
-    @MessageMapping("/ChatService/chat/message/delete")
+    @AspectAnnotation
+    @MessageMapping("/chat/message/delete")
     public void deleteMessage(@Payload DeleteMessageDTO deleteMessageDTO) {
         chatMessageService.deleteMessage(deleteMessageDTO);
     }
 
-    @MessageMapping("/ChatService/chat/message/edit")
+    @AspectAnnotation
+    @MessageMapping("/chat/message/edit")
     public void editMessage(@Payload EditMessageDTO editMessageDTO) {
         chatMessageService.editMessage(editMessageDTO);
     }

@@ -62,7 +62,32 @@ public class Message {
   }
 ```
 
-## 5. Отправка сообщения
+## 5. Подписка на получения информации об удалённом сообщении
+
+- Необходимо подписаться на топик ```ChatService/topic/user/$userId/messages/delete``` , где userId - UUID пользователя
+- Когда второй пользователь удаляет сообщение, через этот топик первому пользователю придет сообщение в формате:
+```
+  public class DeleteMessageDTO {
+    private Long messageId;
+    private UUID senderId;
+    private Long chatRoomId;
+}
+```
+
+## 6. Подписка на получения информации об отредактированном сообщении
+
+- Необходимо подписаться на топик ```ChatService/topic/user/$userId/messages/edit``` , где userId - UUID пользователя
+- Когда второй пользователь редактирует сообщение, через этот топик первому пользователю придет сообщение в формате:
+```
+public class EditMessageDTO {
+    private Long messageId;
+    private Long chatRoomId;
+    private UUID senderId;
+    private String newContent;
+}
+```
+
+## 7. Отправка сообщения
 - Отправка сообщения происходит на адрес ```/ChatService/chat/message/send```
 - Отправляется в формате:
 ```
@@ -75,7 +100,7 @@ public class NewMessageDTO {
 
 Где senderId - UUID отправителя.
 
-## 6. Пометить сообщение прочитанным
+## 8. Пометить сообщение прочитанным
 - Для того чтобы пометить сообщение прочитанным нужно отправить сообщение на адрес ```/ChatService/chat/message/read```
 - Формат сообщения:
 ```
@@ -88,7 +113,7 @@ public class ReadMessageDTO {
 }
 ```
 
-## 7. Удалить сообщение
+## 9. Удалить сообщение
 - Для того чтобы удалить сообщение, нужно отправить сообщение на адрес ```/ChatService/chat/message/read```
 - Формат сообщения:
 ```
@@ -99,7 +124,7 @@ public class DeleteMessageDTO {
 }
 ```
 
-## 8. Редактирование сообщения
+## 10. Редактирование сообщения
 - Для того чтобы редактировать сообщение, нужно отправить сообщение на адрес ```/ChatService/chat/message/read```
 - Формат сообщения:
 ```

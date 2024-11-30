@@ -1,5 +1,6 @@
 package com.example.matcher.chatService.controllers;
 
+import com.example.matcher.chatService.aspect.AspectAnnotation;
 import com.example.matcher.chatService.configuration.WebSocketConfiguration;
 import com.example.matcher.chatService.dto.ChatRoomWithLastMessageDTO;
 import com.example.matcher.chatService.dto.message.DeleteMessageDTO;
@@ -57,6 +58,7 @@ public class ChatController {
             description = "Метод удаляет сообщение из истории")
     @ApiResponse(responseCode = "200", description = "Успешный ответ. Сообщение удалено или не найдено(ничего на сервере не изменилось). Возвращает строку \"succes\"")
     @DeleteMapping("/message/deleteMessage")
+    @AspectAnnotation
     public ResponseEntity<String> deleteMessage(@RequestBody DeleteMessageDTO message) {
         return new ResponseEntity<>(chatMessageService.deleteMessage(message), HttpStatus.OK);
     }
