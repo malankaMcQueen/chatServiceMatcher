@@ -103,6 +103,9 @@ public class ChatRoomService {
         return targetUserId;
     }
 
+    public void deletingAllUserChats(UUID userId) {
+        chatRoomRepository.deleteAllChatRoomsWithUserId(userId);
+    }
 //    public String deleteMessage(Message message, Long chatRoomId) {
 //        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(()
 //                -> new ResourceNotFoundException("Chat with id: " + chatRoomId + "doesnt exist"));

@@ -3,9 +3,11 @@ package com.example.matcher.chatService.repository;
 import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,11 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "OR (c.firstUserId = :secondUserId AND c.secondUserId = :firstUserId)")
     Optional<ChatRoom> findChatRoomBetweenUsers(@Param("firstUserId") UUID firstUserId,
                                                 @Param("secondUserId") UUID secondUserId);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM ChatRoom c WHERE c.firstUserId = :userId OR c.secondUserId = :userId")
+    void deleteAllChatRoomsWithUserId(UUID userId);
 
     @Query("SELECT cr FROM ChatRoom cr WHERE cr.firstUserId = :userId OR cr.secondUserId = :userId ORDER BY cr.timeLastUpdate DESC")
     List<ChatRoom> findListLastChatRooms(@Param("userId") UUID userId);
