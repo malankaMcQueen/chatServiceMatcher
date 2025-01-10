@@ -15,6 +15,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -60,17 +61,6 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
         messageConverters.add(converter);
         return false;
     }
-
-//    @Override
-//    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
-//        DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
-//        resolver.setDefaultMimeType(MimeTypeUtils.APPLICATION_JSON);
-//        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-//        converter.setObjectMapper(new ObjectMapper());
-//        converter.setContentTypeResolver(resolver);
-//        messageConverters.add(converter);
-//        return false;
-//    }
 
     @Override
     @AspectAnnotation

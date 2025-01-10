@@ -1,13 +1,9 @@
 package com.example.matcher.chatService.service;
 
-import com.example.matcher.chatService.aspect.AspectAnnotation;
 import com.example.matcher.chatService.configuration.WebSocketConfiguration;
-import com.example.matcher.chatService.dto.message.DeleteMessageDTO;
-import com.example.matcher.chatService.dto.message.EditMessageDTO;
-import com.example.matcher.chatService.dto.message.NewMessageDTO;
-import com.example.matcher.chatService.dto.message.ReadMessageDTO;
+import com.example.matcher.chatService.dto.TypingMessageDTO;
+import com.example.matcher.chatService.dto.message.*;
 import com.example.matcher.chatService.exception.BadRequestException;
-import com.example.matcher.chatService.exception.InvalidCredentialsException;
 import com.example.matcher.chatService.exception.ResourceNotFoundException;
 import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
@@ -22,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Service
@@ -111,6 +106,12 @@ public class ChatMessageService {
             }
         }
         return message;
+    }
+
+    public void typingSignal(TypingMessageDTO typingMessageDTO) {
+        UUID targetUserId = chatRoomService.getIdAnotherUser(typingMessageDTO.getChatRoomId(), typingMessageDTO.getSenderId());
+        String topic = "/ChatService/topic/user/" + targetUserId.toString() + "/typing";
+        messagingTemplate.convertAndSend(topic, typingMessageDTO);
     }
 }
 
