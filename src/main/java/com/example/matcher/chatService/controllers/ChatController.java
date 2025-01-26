@@ -27,6 +27,7 @@ import java.util.UUID;
 @Controller
 @AllArgsConstructor
 @Tag(name = "Chat controller", description = "API for operations with chat and message")
+@RequestMapping("/ChatService/")
 public class ChatController {
 
     private ChatMessageService chatMessageService;
