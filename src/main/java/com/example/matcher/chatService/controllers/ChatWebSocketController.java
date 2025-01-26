@@ -1,18 +1,12 @@
 package com.example.matcher.chatService.controllers;
 
 import com.example.matcher.chatService.aspect.AspectAnnotation;
-import com.example.matcher.chatService.dto.AcknowledgementDto;
-import com.example.matcher.chatService.dto.message.NewMessageDTO;
-import com.example.matcher.chatService.dto.message.DeleteMessageDTO;
-import com.example.matcher.chatService.dto.message.EditMessageDTO;
-import com.example.matcher.chatService.dto.message.ReadMessageDTO;
-import com.example.matcher.chatService.model.Message;
-import com.example.matcher.chatService.model.MessageStatus;
+import com.example.matcher.chatService.dto.TypingMessageDTO;
+import com.example.matcher.chatService.dto.message.*;
 import com.example.matcher.chatService.service.ChatMessageService;
 import lombok.AllArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -41,6 +35,12 @@ public class ChatWebSocketController {
     @MessageMapping("/chat/message/edit")
     public void editMessage(@Payload EditMessageDTO editMessageDTO) {
         chatMessageService.editMessage(editMessageDTO);
+    }
+
+    @AspectAnnotation
+    @MessageMapping("/chat/typing")
+    public void typingMessage(@Payload TypingMessageDTO typingMessageDTO) {
+        chatMessageService.typingSignal(typingMessageDTO);
     }
 
 }
