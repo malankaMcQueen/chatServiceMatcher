@@ -7,10 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ChatMessageRepository extends JpaRepository<Message, Long> {
-
+    List<Message> findByIdIn(Set<Long> ids);
 //    List<Message> findByChatId(String chatId);
 
 //    long countBySenderIdAndRecipientIdAndStatus(String senderId, String recipientId, MessageStatus status);

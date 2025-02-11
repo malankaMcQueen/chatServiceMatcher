@@ -2,11 +2,13 @@ package com.example.matcher.chatService.service;
 
 import com.example.matcher.chatService.configuration.WebSocketConfiguration;
 import com.example.matcher.chatService.dto.ChatRoomWithLastMessageDTO;
+import com.example.matcher.chatService.dto.message.MessageResponseDTO;
 import com.example.matcher.chatService.exception.InvalidCredentialsException;
 import com.example.matcher.chatService.exception.ResourceAlreadyExistsException;
 import com.example.matcher.chatService.exception.ResourceNotFoundException;
 import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
+import com.example.matcher.chatService.repository.ChatMessageRepository;
 import com.example.matcher.chatService.repository.ChatRoomRepository;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -14,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +26,7 @@ public class ChatRoomService {
 
 
     private ChatRoomRepository chatRoomRepository;
+    private ChatMessageRepository chatMessageRepository;
     public Message addNewMessage(Message message, Long chatId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatId).orElseThrow(()
                 -> new ResourceNotFoundException("Chat Id: " + chatId + " not found"));
@@ -61,9 +61,25 @@ public class ChatRoomService {
         return chatRoomRepository.findChatHistoryBetweenUsers(senderId, recipientId);
     }
 
-    public List<Message> getHistoryChat(Long chatId) {
-        return chatRoomRepository.findChatHistoryByChatId(chatId);
+    public List<MessageResponseDTO> getHistoryChat(Long chatId) {
+        List<Message> messageList = chatRoomRepository.findChatHistoryByChatId(chatId);
+
+        // Собираем все replyToMessageId, чтобы не делать много SQL-запросов
+        Set<Long> replyIds = messageList.stream()
+                .map(Message::getReplyToMessageId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // Загружаем все сообщения, на которые были ответы, одним запросом
+        Map<Long, Message> replyMessages = chatMessageRepository.findByIdIn(replyIds).stream()
+                .collect(Collectors.toMap(Message::getId, msg -> msg));
+        // Преобразуем в DTO
+        return messageList.stream()
+                .map(message -> MessageResponseDTO.fromEntity(
+                        message, replyMessages.get(message.getReplyToMessageId())))
+                .collect(Collectors.toList());
     }
+
 
     public List<ChatRoomWithLastMessageDTO> getListLastChatRooms(UUID userId) {
         List<Object[]> results = chatRoomRepository.findListLastChatRoomsWithLastMessage(userId);

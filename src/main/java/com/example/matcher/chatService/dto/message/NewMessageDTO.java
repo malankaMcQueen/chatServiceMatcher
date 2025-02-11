@@ -1,6 +1,5 @@
 package com.example.matcher.chatService.dto.message;
 
-import com.example.matcher.chatService.model.MessageStatus;
 import lombok.Data;
 
 import java.util.UUID;
@@ -10,4 +9,5 @@ public class NewMessageDTO {
     private UUID senderId;
     private Long chatRoomId;
     private String content;
+    private Long replyToMessageId;
 }
