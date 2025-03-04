@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "chat_messages")
+@Table(schema = "chat", name = "messages")
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +24,6 @@ public class Message {
 
     private String content;
 
-    private LocalDateTime timestamp;
+    private LocalDateTime time;
     private MessageStatus status;
 }

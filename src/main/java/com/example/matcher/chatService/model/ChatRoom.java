@@ -15,13 +15,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "chat_rooms", indexes = {
-        @Index(name = "idx_first_user", columnList = "firstUserId"),
-        @Index(name = "idx_second_user", columnList = "secondUserId")
-})
+@Table(schema = "chat", name = "chat_rooms")
 public class ChatRoom {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private UUID firstUserId;
     private UUID secondUserId;

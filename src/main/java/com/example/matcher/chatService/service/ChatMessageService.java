@@ -35,7 +35,7 @@ public class ChatMessageService {
         Message message = new Message();
         message.setContent(newMessageDTO.getContent());
         message.setSenderId(newMessageDTO.getSenderId());
-        message.setTimestamp(LocalDateTime.now());
+        message.setTime(LocalDateTime.now());
         message.setStatus(MessageStatus.DELIVERY);
         message = chatRoomService.addNewMessage(message, newMessageDTO.getChatRoomId()); // Сохранит Message через каскад
         return message;

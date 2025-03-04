@@ -36,8 +36,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 //    List<ChatRoom> findListLastChatRoomsWithLastMessage(@Param("userId") UUID userId);
 
     @Query("SELECT cr, m FROM ChatRoom cr " +
-            "LEFT JOIN Message m ON m.chatRoom = cr AND m.timestamp = " +
-            "(SELECT MAX(msg.timestamp) FROM Message msg WHERE msg.chatRoom = cr) " +
+            "LEFT JOIN Message m ON m.chatRoom = cr AND m.time = " +
+            "(SELECT MAX(msg.time) FROM Message msg WHERE msg.chatRoom = cr) " +
             "WHERE (cr.firstUserId = :userId OR cr.secondUserId = :userId) " +
             "ORDER BY cr.timeLastUpdate DESC")
     List<Object[]> findListLastChatRoomsWithLastMessage(@Param("userId") UUID userId);
@@ -46,11 +46,11 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     @Query("SELECT m FROM Message m WHERE (m.chatRoom.firstUserId = :senderId AND m.chatRoom.secondUserId = :recipientId) " +
             "OR (m.chatRoom.firstUserId = :recipientId AND m.chatRoom.secondUserId = :senderId) " +
-            "ORDER BY m.timestamp DESC")
+            "ORDER BY m.time DESC")
     List<Message> findChatHistoryBetweenUsers(@Param("senderId") UUID senderId,
                                               @Param("recipientId") UUID recipientId);
 
-    @Query("SELECT m FROM Message m WHERE m.chatRoom.id = :chatId ORDER BY m.timestamp DESC")
+    @Query("SELECT m FROM Message m WHERE m.chatRoom.id = :chatId ORDER BY m.time DESC")
     List<Message> findChatHistoryByChatId(@Param("chatId") Long chatId);
 
 
