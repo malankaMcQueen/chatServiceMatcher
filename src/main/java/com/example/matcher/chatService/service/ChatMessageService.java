@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -66,6 +67,13 @@ public class ChatMessageService {
         } else {
             throw new BadRequestException("Some Error");
         }
+        if (newMessageDTO.getReplyToMessageId() != null) {
+            Optional<Message> replyMessage = chatMessageRepository.findById(newMessageDTO.getReplyToMessageId());
+            if (replyMessage.isEmpty() || !chatRoom.getId().equals(newMessageDTO.getChatRoomId())) {
+                newMessageDTO.setReplyToMessageId(null);
+            }
+        }
+
         Message message = saveNewMessage(newMessageDTO);
         String topic = "/ChatService/topic/user/" + message.getSenderId() + "/message/confirmations";
         messagingTemplate.convertAndSend(topic, message);

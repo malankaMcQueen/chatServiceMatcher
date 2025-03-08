@@ -5,6 +5,7 @@ import com.example.matcher.chatService.configuration.WebSocketConfiguration;
 import com.example.matcher.chatService.dto.ChatRoomWithLastMessageDTO;
 import com.example.matcher.chatService.dto.message.DeleteMessageDTO;
 import com.example.matcher.chatService.dto.message.EditMessageDTO;
+import com.example.matcher.chatService.dto.message.MessageResponseDTO;
 import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
 import com.example.matcher.chatService.service.ChatMessageService;
@@ -70,19 +71,19 @@ public class ChatController {
     public ResponseEntity<List<ChatRoomWithLastMessageDTO>> getListLastChatRooms(@PathVariable UUID userId) {
         return new ResponseEntity<>(chatRoomService.getListLastChatRooms(userId), HttpStatus.OK);
     }
-    @Operation(summary = "Получить историю всего чата ПО ID ПОЛЬЗОВАТЕЛЕЙ",
-            description = "Возвращает список всех сообщений в данном чате, отсортированных по времени (List[0] - последнее сообщение")
-    @ApiResponse(responseCode = "200", description = "Успешный ответ. Возвращает список моделей Message")
-    @GetMapping("/chat/getHistory")
-    public ResponseEntity<List<Message>> getChatHistory(@RequestParam UUID senderId,
-                                                        @RequestParam UUID recipientId) {
-        return new ResponseEntity<>(chatRoomService.getHistoryChat(senderId, recipientId), HttpStatus.OK);
-    }
+//    @Operation(summary = "Получить историю всего чата ПО ID ПОЛЬЗОВАТЕЛЕЙ",
+//            description = "Возвращает список всех сообщений в данном чате, отсортированных по времени (List[0] - последнее сообщение")
+//    @ApiResponse(responseCode = "200", description = "Успешный ответ. Возвращает список моделей Message")
+//    @GetMapping("/chat/getHistory")
+//    public ResponseEntity<List<Message>> getChatHistory(@RequestParam UUID senderId,
+//                                                        @RequestParam UUID recipientId) {
+//        return new ResponseEntity<>(chatRoomService.getHistoryChat(senderId, recipientId), HttpStatus.OK);
+//    }
     @Operation(summary = "Получить историю всего чата ПО ID чата",
             description = "Возвращает список всех сообщений в данном чате, отсортированных по времени (List[0] - последнее сообщение")
     @ApiResponse(responseCode = "200", description = "Успешный ответ. Возвращает список моделей Message")
     @GetMapping("/chat/getHistory/{chatId}")
-    public ResponseEntity<List<Message>> getChatHistory(@PathVariable Long chatId) {
+    public ResponseEntity<List<MessageResponseDTO>> getChatHistory(@PathVariable Long chatId) {
         return new ResponseEntity<>(chatRoomService.getHistoryChat(chatId), HttpStatus.OK);
     }
     @Operation(summary = "Редактирование сообщения",

@@ -27,4 +27,7 @@ public class Message {
 
     private LocalDateTime time;
     private MessageStatus status;
+
+    @Column(name = "reply_to_message_id")
+    private Long replyToMessageId;
 }
