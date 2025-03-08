@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@Controller
+@RestController
 @AllArgsConstructor
 @Tag(name = "Chat controller", description = "API for operations with chat and message")
 @RequestMapping("/ChatService/")

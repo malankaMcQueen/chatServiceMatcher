@@ -23,6 +23,7 @@ public class Message {
     private ChatRoom chatRoom;
 
     private String content;
+    private MessageType messageType;
 
     private LocalDateTime time;
     private MessageStatus status;
