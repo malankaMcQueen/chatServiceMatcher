@@ -8,6 +8,7 @@ import com.example.matcher.chatService.exception.ResourceNotFoundException;
 import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
 import com.example.matcher.chatService.model.MessageStatus;
+import com.example.matcher.chatService.model.MessageType;
 import com.example.matcher.chatService.repository.ChatMessageRepository;
 import com.example.matcher.chatService.repository.ChatRoomRepository;
 import lombok.AllArgsConstructor;
@@ -36,6 +37,7 @@ public class ChatMessageService {
         Message message = new Message();
         message.setContent(newMessageDTO.getContent());
         message.setSenderId(newMessageDTO.getSenderId());
+        message.setMessageType(newMessageDTO.getMessageType() != null ? newMessageDTO.getMessageType() : MessageType.TEXT);
         message.setTime(LocalDateTime.now());
         message.setStatus(MessageStatus.DELIVERY);
         message = chatRoomService.addNewMessage(message, newMessageDTO.getChatRoomId()); // Сохранит Message через каскад
@@ -53,9 +55,9 @@ public class ChatMessageService {
 
 
     @Transactional
-    public void sendNewMessage(NewMessageDTO newMessageDTO) {
+    public Message sendNewMessage(NewMessageDTO newMessageDTO) {
         if (newMessageDTO.getContent().isEmpty()) {
-            return;
+            return null;
         }
         ChatRoom chatRoom = chatRoomRepository.findById(newMessageDTO.getChatRoomId()).orElseThrow(()
                 -> new ResourceNotFoundException("Chat with id: " + newMessageDTO.getChatRoomId() + "not exist"));
@@ -80,6 +82,7 @@ public class ChatMessageService {
         messagingTemplate.convertAndSendToUser(
                 targetUserId.toString(), "/queue/messages", message);
 
+        return message;
     }
 
 

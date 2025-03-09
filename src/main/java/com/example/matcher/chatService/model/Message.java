@@ -1,5 +1,7 @@
 package com.example.matcher.chatService.model;
 
+import com.example.matcher.chatService.model.converter.MessageStatusConverter;
+import com.example.matcher.chatService.model.converter.MessageTypeConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -23,9 +25,14 @@ public class Message {
     private ChatRoom chatRoom;
 
     private String content;
+
+    @Column(name = "type")
+    @Convert(converter = MessageTypeConverter.class)
     private MessageType messageType;
 
     private LocalDateTime time;
+
+    @Convert(converter = MessageStatusConverter.class)
     private MessageStatus status;
 
     @Column(name = "reply_to_message_id")

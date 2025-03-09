@@ -18,6 +18,10 @@ public class ChatServiceApplication {
 		System.setProperty("spring.datasource.username", EnvironmentLoader.get("SPRING_DATASOURCE_USERNAME"));
 		System.setProperty("spring.datasource.password", EnvironmentLoader.get("SPRING_DATASOURCE_PASSWORD"));
 
+		System.setProperty("aws.access.key", EnvironmentLoader.get("AWS_ACCESS_KEY"));
+		System.setProperty("aws.secret.key", EnvironmentLoader.get("AWS_SECRET_KEY"));
+		System.setProperty("aws.s3.my_domain", EnvironmentLoader.get("AWS_MY_DOMAIN"));
+		System.setProperty("aws.s3.buck_name", EnvironmentLoader.get("AWS_BUCK_NAME"));
 
 		System.setProperty("spring.kafka.bootstrap-servers", EnvironmentLoader.get("SPRING_KAFKA_BOOTSTRAP_SERVERS", "http://localhost:9092"));
 		System.setProperty("eureka.client.service-url.defaultZone", EnvironmentLoader.get("EUREKA_DEFAULT_ZONE", "http://localhost:8761/eureka/"));

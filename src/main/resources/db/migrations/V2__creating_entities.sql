@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS chat.messages (
     chat_room_id BIGINT REFERENCES chat.chat_rooms(id) ON DELETE CASCADE,
     sender_id UUID,
     time TIMESTAMP,
-    status SMALLINT,
+    status INTEGER,
+    type INTEGER,
     content VARCHAR(255)
 );

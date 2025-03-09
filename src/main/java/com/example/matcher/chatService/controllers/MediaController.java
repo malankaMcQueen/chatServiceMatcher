@@ -1,17 +1,9 @@
 package com.example.matcher.chatService.controllers;
 
-import com.example.matcher.chatService.aspect.AspectAnnotation;
 import com.example.matcher.chatService.configuration.WebSocketConfiguration;
-import com.example.matcher.chatService.dto.ChatRoomWithLastMessageDTO;
-import com.example.matcher.chatService.dto.message.DeleteMessageDTO;
-import com.example.matcher.chatService.dto.message.EditMessageDTO;
-import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
-import com.example.matcher.chatService.service.ChatMessageService;
-import com.example.matcher.chatService.service.ChatRoomService;
 import com.example.matcher.chatService.service.MediaService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -19,11 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -41,7 +32,7 @@ public class MediaController {
 //    @ApiResponse(responseCode = "409", description = "Чат между данными пользователями уже создан", content = @Content())
     @PostMapping("/photo/upload")
     public ResponseEntity<Message> uploadFile(@RequestParam("chatId") Long chatId, @RequestParam("senderId") UUID senderId,
-                                              @RequestParam("file") MultipartFile file) {
+                                              @RequestParam("file") MultipartFile file) throws IOException {
         return new ResponseEntity<>(mediaService.uploadPhoto(chatId, senderId, file), HttpStatus.OK);
     }
 

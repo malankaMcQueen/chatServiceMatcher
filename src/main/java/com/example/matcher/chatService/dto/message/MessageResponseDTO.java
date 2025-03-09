@@ -22,14 +22,14 @@ public class MessageResponseDTO {
                 .id(message.getId())
                 .senderId(message.getSenderId())
                 .content(message.getContent())
-                .timestamp(message.getTimestamp())
+                .timestamp(message.getTime())
                 .replyToMessageId(message.getReplyToMessageId())
                 .build();
-        response.setId(message.getId());
-        response.setSenderId(message.getSenderId());
-        response.setContent(message.getContent());
-        response.setTimestamp(message.getTimestamp());
-        response.setReplyToMessageId(message.getReplyToMessageId());
+//        response.setId(message.getId());
+//        response.setSenderId(message.getSenderId());
+//        response.setContent(message.getContent());
+//        response.setTimestamp(message.getTime());
+//        response.setReplyToMessageId(message.getReplyToMessageId());
 
         response.setReplyToMessageContent(replyMessage != null ? replyMessage.getContent() : null);
 

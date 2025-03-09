@@ -1,29 +1,46 @@
 package com.example.matcher.chatService.service;
 
+import com.example.matcher.chatService.configuration.WebSocketConfiguration;
 import com.example.matcher.chatService.dto.message.NewMessageDTO;
-import com.example.matcher.chatService.exception.BadRequestException;
-import com.example.matcher.chatService.exception.ResourceNotFoundException;
-import com.example.matcher.chatService.model.ChatRoom;
 import com.example.matcher.chatService.model.Message;
+import com.example.matcher.chatService.model.MessageType;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class MediaService {
-    ChatMessageService messageService;
-    public Message uploadPhoto(Long chatId, UUID senderId, MultipartFile file) {
+    private static final Logger logger = LoggerFactory.getLogger(MediaService.class);
+    private final S3Service s3Service;
 
-        String photoURL = "asd";
+    ChatMessageService messageService;
+    public Message uploadPhoto(Long chatId, UUID senderId, MultipartFile file) throws IOException {
+        File processedFile = ImageProcessor.processImageWithThumbnailator(file);
+        String photoUrl = s3Service.uploadFile(chatId, processedFile);
+        if (!processedFile.delete()) {
+            logger.warn("Failed to delete temporary processed file: " + processedFile.getAbsolutePath());
+        }
         NewMessageDTO newMessageDTO = NewMessageDTO.builder()
                 .chatRoomId(chatId)
                 .senderId(senderId)
-                .content(photoURL)
+                .content(photoUrl)
+                .messageType(MessageType.PHOTO)
                 .build();
-        messageService.sendNewMessage(newMessageDTO);
-
-        return null;
+        Message message = null;
+        try {
+            message = messageService.sendNewMessage(newMessageDTO);
+        } catch (Exception e) {
+            s3Service.deleteFile(photoUrl);
+            throw new RuntimeException("Message saving failed, rollback photo upload", e);
+        }
+        return message;
     }
 
 //    public void sendNewMessage(NewMessageDTO newMessageDTO) {

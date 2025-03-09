@@ -1,5 +1,6 @@
 package com.example.matcher.chatService.dto.message;
 
+import com.example.matcher.chatService.model.MessageType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,4 +13,5 @@ public class NewMessageDTO {
     private Long chatRoomId;
     private String content;
     private Long replyToMessageId;
+    private MessageType messageType;
 }
